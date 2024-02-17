@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../models/User";
+import { responseFormat, responseFormatError } from "../utils/methods";
 
 const router = express.Router();
 
@@ -8,19 +9,23 @@ router.get('/test', (req, res) => {
 })
 
 router.post('/add', async (req, res) => {
-    const {
-        name,
-        email
-    } = req.body;
+    try {
+        const {
+            name,
+            email
+        } = req.body;
 
-    const user = User.create({
-        updatedBy: 'abc',
-        name,
-        email
-    })
-    await user.save()
+        const user = User.create({
+            updatedBy: 'abc',
+            name,
+            email
+        })
+        await user.save()
 
-    res.json(user)
+        responseFormat(res, user)
+    } catch (error: any) {
+        responseFormatError(res, 500, "Error in Adding User")
+    }
 })
 
 router.get('/fetch/pageNo/:pageNo', async (req, res) => {
@@ -34,9 +39,9 @@ router.get('/fetch/pageNo/:pageNo', async (req, res) => {
         }
 
         const users = await User.find(options);
-        res.status(200).json(users)
+        responseFormat(res, users)
     } catch (error: any) {
-        res.status(500).json({ "message": "Error in Fetching Users" })
+        responseFormatError(res, 500, "Error in Fetching Users")
     }
 })
 
