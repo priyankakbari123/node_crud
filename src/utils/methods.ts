@@ -1,7 +1,14 @@
-export const responseFormat = (res: any, data: any) => {
-    res.status(200).json(data);
+import bcrypt from 'bcrypt';
+
+export const responseFormat = (response: any, data: any) => {
+    response.status(200).json(data);
 }
 
-export const responseFormatError = (res: any, status: number, message: string) => {
-    res.status(status).json({"messages":message});
+export const responseFormatError = (response: any, status: number, message: string) => {
+    response.status(status).json({"messages":message});
 }
+
+export const hash = async (text: string) => {
+    const salt = await bcrypt.genSalt(10);
+    return await bcrypt.hash(text, salt);
+};

@@ -1,6 +1,5 @@
 import express from "express";
 import User from "../models/User";
-import { responseFormat, responseFormatError } from "../utils/methods";
 const userController= require("../controllers/usercontroller");
 
 const router = express.Router();
@@ -10,7 +9,8 @@ router.get('/test', (req, res) => {
 })
 
 router.post('/add',userController.addUser)
-
 router.get('/fetch/pageNo/:pageNo', userController.fetchUsers)
+router.get('/fetch/id/:id', userController.getUserById)
+
 
 export default router;

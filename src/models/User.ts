@@ -1,4 +1,5 @@
-import {Entity, BaseEntity, Column, IntegerType, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import {Entity, BaseEntity, Column, IntegerType, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn} from "typeorm";
+import Role from "./Role";
 
 @Entity('user')
 export default class User extends BaseEntity{
@@ -25,6 +26,11 @@ export default class User extends BaseEntity{
     @Column({name:'updated_by'})
     updatedBy!:string
 
-    pwd!:string
+    @Column({name:'password'})
+    password!:string
+
+    @ManyToOne(() => Role, role=>role.users) // Many-to-one relationship with Role
+    @JoinColumn({ name: 'role_id' }) // Foreign key column in the user table
+    role!: Role;
 
 }
