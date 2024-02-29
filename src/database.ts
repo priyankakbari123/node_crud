@@ -1,6 +1,8 @@
 import {DataSource } from "typeorm";
 import User from "./models/User";
 import Role from "./models/Role";
+import Cart from "./models/Cart";
+import Banner from "./models/Banner";
 require('dotenv').config()
 
 const connectDB= new DataSource({
@@ -12,7 +14,7 @@ const connectDB= new DataSource({
     database:process.env.MYSQL_DATABASE,
     logging:false,
     synchronize:true,
-    entities:[User,Role]
+    entities:[User,Role,Cart,Banner]
 })
 
 connectDB.initialize()

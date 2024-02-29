@@ -2,7 +2,7 @@ import Role from "../models/Role";
 import User from "../models/User";
 import { hash, responseFormat, responseFormatError } from "../utils/methods";
 
-exports.addUser=async(req,res)=>{
+export const addUser=async(req,res)=>{
     try {
         const {
             name,
@@ -35,7 +35,7 @@ exports.addUser=async(req,res)=>{
     }
 }
 
-exports.fetchUsers=async(req,res)=>{
+export const fetchUsers=async(req,res)=>{
     try {
         const pageNo: number = parseInt(req.params.pageNo);
         const perPage = parseInt(req.params.perPage) || 10;
@@ -53,7 +53,7 @@ exports.fetchUsers=async(req,res)=>{
     }
 }
 
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
 
     try {
