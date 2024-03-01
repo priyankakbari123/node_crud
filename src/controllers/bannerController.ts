@@ -27,7 +27,7 @@ export const updateBanner = async (req, res) => {
         const banner = await Banner.findOne({ where: { id } });
 
         if (!banner) {
-            return responseFormatError(res, 404, "Banner not found.")
+            return responseFormatError(res, 406, "Banner you are trying to update is not found.")
         }
 
         banner.imgName = imgName || banner.imgName;
@@ -51,5 +51,22 @@ export const fetchBanners = async (req, res) => {
     } catch (error: any) {
         console.log(error);
         responseFormatError(res, 500, "Error in fetchBanners");
+    }
+}
+
+export const deleteBanner = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const banner = await Banner.findOne({ where: { id } });
+
+        if (!banner) {
+            return responseFormatError(res, 406, "Banner you are trying to delete is not found.")
+        }
+        await Banner.delete(id);
+        responseFormat(res, "Banner Deleted Successfully.")
+
+    } catch (error) {
+        console.error(error)
+        responseFormatError(res, 500, "Error in deleteBanner.")
     }
 }

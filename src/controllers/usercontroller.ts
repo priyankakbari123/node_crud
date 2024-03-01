@@ -2,29 +2,34 @@ import Role from "../models/Role";
 import User from "../models/User";
 import { hash, responseFormat, responseFormatError } from "../utils/methods";
 
-export const addUser=async(req,res)=>{
+export const addUser = async (req, res) => {
     try {
         const {
             name,
+            username,
             email,
+            contactNo,
             password,
+            imgUrl,
             roleId
         } = req.body;
 
-
-        const role=await Role.findOne({where:{id: roleId}});
-        if(!role){
-            return responseFormatError(res,406,"Role Not Found for id "+roleId)
+        const role = await Role.findOne({ where: { id: roleId } });
+        if (!role) {
+            return responseFormatError(res, 406, "Role Not Found for id " + roleId)
         }
 
-        const hashedPwd=await hash(password);
+        const hashedPwd = await hash(password);
 
         const user = User.create({
-            updatedBy: 'abc',
             name,
+            username,
             email,
-            password:hashedPwd.toString(),
-            role
+            contactNo,
+            password: hashedPwd.toString(),
+            role,
+            imgUrl,
+            createdBy: "Admin" //loggedInUser
         })
         await user.save()
 
@@ -33,9 +38,45 @@ export const addUser=async(req,res)=>{
         responseFormatError(res, 500, "Error in Adding User")
         console.error(error)
     }
-}
+};
 
-export const fetchUsers=async(req,res)=>{
+export const updateUser = async (req, res) => {
+    const {
+        id,
+        name,
+        username,
+        email,
+        contactNo,
+        imgUrl,
+        roleId,
+    } = req.body;
+
+    try {
+        const user = await User.findOneBy({id:id});
+
+        if (!user) {
+            return responseFormatError(res, 406, 'User you are trying to update is not found.');
+        }
+
+        user.name = name || user.name;
+        user.username = username || user.username;
+        user.email = email || user.email;
+        user.contactNo = contactNo || user.contactNo;
+        user.imgUrl = imgUrl || user.imgUrl;
+        user.role = await Role.findOneBy(roleId || user.role.id);
+
+        user.updatedBy = 'updated_user'; // loggedInUser
+
+        await user.save();
+
+        responseFormat(res, user);
+    } catch (error) {
+        console.error('Error in updating user:', error);
+        responseFormatError(res, 500, 'Error in updateUser.');
+    }
+};
+
+export const fetchUsers = async (req, res) => {
     try {
         const pageNo: number = parseInt(req.params.pageNo);
         const perPage = parseInt(req.params.perPage) || 10;
@@ -43,7 +84,8 @@ export const fetchUsers=async(req,res)=>{
         const options: any = {
             skip: (pageNo - 1) * perPage,
             take: perPage,
-            relations:['role']
+            relations: ['role'],
+            order: { createdAt: "DESC" },
         }
 
         const users = await User.find(options);
@@ -51,7 +93,7 @@ export const fetchUsers=async(req,res)=>{
     } catch (error: any) {
         responseFormatError(res, 500, "Error in Fetching Users")
     }
-}
+};
 
 export const getUserById = async (req, res) => {
     const userId = parseInt(req.params.id);
