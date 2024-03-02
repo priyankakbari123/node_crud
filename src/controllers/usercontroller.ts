@@ -76,6 +76,31 @@ export const updateUser = async (req, res) => {
     }
 };
 
+export const updatePwd=async (req,res)=>{
+    try {
+        const { email, password } = req.body;
+    
+        let user = await User.findOne({ where: { email } });
+        if (!user) {
+          return responseFormatError(res,406, "User you are trying to update is does not exist.")
+        }
+    
+        const hashedPassword = await hash(password);
+    
+        if (hashedPassword == undefined) {
+          return responseFormatError(res,500, "Error in Hashing Password.")
+        }
+    
+        user.password = hashedPassword;
+        const updatedUser = await User.save(user);
+    
+        responseFormat(res,"Password Changed Successfully.")
+      } catch (error) {
+        console.error(error);
+        return responseFormatError(res,500, 'Error in Changing Password.');
+      }
+};
+
 export const fetchUsers = async (req, res) => {
     try {
         const pageNo: number = parseInt(req.params.pageNo);
