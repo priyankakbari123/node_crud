@@ -11,6 +11,9 @@ export default class Role extends BaseEntity {
     @Column({ name: 'name' })
     name!: string;
 
+    @Column({name:'permissions',type:'json'})
+    permissions!:string
+
     @OneToMany(()=>User, user=>user.role)
     users:User[]
 
