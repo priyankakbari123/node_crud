@@ -1,5 +1,8 @@
 import Role from "../models/Role";
 import User from "../models/User";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+
 import { hash, responseFormat, responseFormatError } from "../utils/methods";
 
 export const addUser = async (req, res) => {
@@ -52,7 +55,7 @@ export const updateUser = async (req, res) => {
     } = req.body;
 
     try {
-        const user = await User.findOneBy({id:id});
+        const user = await User.findOneBy({ id: id });
 
         if (!user) {
             return responseFormatError(res, 406, 'User you are trying to update is not found.');
@@ -76,29 +79,29 @@ export const updateUser = async (req, res) => {
     }
 };
 
-export const updatePwd=async (req,res)=>{
+export const updatePwd = async (req, res) => {
     try {
         const { email, password } = req.body;
-    
+
         let user = await User.findOne({ where: { email } });
         if (!user) {
-          return responseFormatError(res,406, "User you are trying to update is does not exist.")
+            return responseFormatError(res, 406, "User you are trying to update is does not exist.")
         }
-    
+
         const hashedPassword = await hash(password);
-    
+
         if (hashedPassword == undefined) {
-          return responseFormatError(res,500, "Error in Hashing Password.")
+            return responseFormatError(res, 500, "Error in Hashing Password.")
         }
-    
+
         user.password = hashedPassword;
         const updatedUser = await User.save(user);
-    
-        responseFormat(res,"Password Changed Successfully.")
-      } catch (error) {
+
+        responseFormat(res, "Password Changed Successfully.")
+    } catch (error) {
         console.error(error);
-        return responseFormatError(res,500, 'Error in Changing Password.');
-      }
+        return responseFormatError(res, 500, 'Error in Changing Password.');
+    }
 };
 
 export const fetchUsers = async (req, res) => {
@@ -137,5 +140,38 @@ export const getUserById = async (req, res) => {
     } catch (error) {
         console.error('Error fetching user:', error);
         responseFormatError(res, 500, 'Error fetching user');
+    }
+};
+
+export const userLogin = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = await User.findOne({
+            where: [
+                { email: username },
+                { username: username },
+            ],
+        });
+
+        if (!user) {
+            responseFormatError(res, 406, "User with username: " + username + " not found.")
+        }
+
+        const passwordMatched: boolean = await bcrypt.compare(password, user.password);
+
+        if (!passwordMatched) {
+            return responseFormatError(res, 406, "Credentials are wrong!")
+        }
+
+        const token:string = jwt.sign({ userId: user.id, username: user.username, email: user.email },
+            process.env.SECRET, { expiresIn: '1h' });
+        
+        user.accessToken=token;
+
+        responseFormat(res, user)
+
+    } catch (error) {
+        console.error(error)
+        responseFormatError(res, 500, "Error in UserLogin.");
     }
 };

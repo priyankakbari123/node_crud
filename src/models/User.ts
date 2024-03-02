@@ -47,4 +47,6 @@ export default class User extends BaseEntity{
     @Column({name:'created_by'})
     createdBy!:string
 
+    accessToken!:string
+
 }

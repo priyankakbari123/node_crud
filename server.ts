@@ -4,6 +4,7 @@ import commonRoutes from "./src/routes/commonRoutes";
 import imgRoutes from "./src/routes/imgRoutes";
 import bannerRoutes from './src/routes/bannerRoutes';
 import bannerPublicRoutes from './src/routes/bannerPublicRoutes';
+import userPublicRoutes from "./src/routes/userPublicRoutes";
 
 const express=require("express");
 
@@ -14,6 +15,7 @@ connectDB
 app.use(express.json())
 //routes
 app.use('/user',userRoutes)
+app.use('/user/public',userPublicRoutes)
 app.use('/common',commonRoutes)
 app.use('/img',imgRoutes)
 app.use('/banner',bannerRoutes)
