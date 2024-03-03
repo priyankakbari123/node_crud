@@ -19,6 +19,9 @@ export default class Banner extends BaseEntity{
     @Column({name:'status'})
     status!:string
 
+    @Column({name:'redirect_url'})
+    redirectUrl!:string
+
     @CreateDateColumn({name:'created_at'})
     createdAt!:Date
 

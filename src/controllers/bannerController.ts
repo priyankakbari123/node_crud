@@ -4,12 +4,13 @@ import { responseFormat, responseFormatError } from "../utils/methods"
 
 export const addBanner = async (req, res) => {
     try {
-        const { imgName, imgUrl, order, status } = req.body;
+        const { imgName, imgUrl, order, status, redirectUrl } = req.body;
         const banner = Banner.create({
             imgName,
             imgUrl,
             order,
             status: status || "Active",
+            redirectUrl: redirectUrl || "",
             createdBy: "Admin"//loggedInUser
         })
 
@@ -23,7 +24,7 @@ export const addBanner = async (req, res) => {
 
 export const updateBanner = async (req, res) => {
     try {
-        const { id, imgName, imgUrl, order, status } = req.body;
+        const { id, imgName, imgUrl, order, status, redirectUrl } = req.body;
         const banner = await Banner.findOne({ where: { id } });
 
         if (!banner) {
@@ -34,6 +35,7 @@ export const updateBanner = async (req, res) => {
         banner.imgUrl = imgUrl || banner.imgUrl;
         banner.order = order || banner.order;
         banner.status = status || banner.status;
+        banner.redirectUrl = redirectUrl || banner.redirectUrl;
         banner.updatedBy = "Admin"; //loggedin user
         await banner.save();
 
